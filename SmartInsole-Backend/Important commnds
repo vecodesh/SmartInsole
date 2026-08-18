@@ -1,0 +1,2 @@
+mosquitto -c "C:\Program Files\mosquitto\smart-insole.conf" -v
+//To run the mosquito

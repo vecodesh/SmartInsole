@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Smart Insole Dashboard</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            margin: 0;
+            padding: 30px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .dashboard {
+            max-width: 900px;
+            margin: 30px auto;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+
+        .value {
+            font-size: 30px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .status {
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>🦶 Smart Insole Dashboard</h1>
+
+    <div class="dashboard">
+
+        <div class="card">
+            <h3>Pressure Raw</h3>
+            <div class="value" id="pressureRaw">--</div>
+        </div>
+
+        <div class="card">
+            <h3>Pressure Voltage</h3>
+            <div class="value" id="pressureVoltage">--</div>
+        </div>
+
+        <div class="card">
+            <h3>FSR Resistance</h3>
+            <div class="value" id="fsrResistance">--</div>
+        </div>
+
+        <div class="card">
+            <h3>Temperature</h3>
+            <div class="value" id="temperature">--</div>
+        </div>
+
+    </div>
+
+    <div class="status">
+        Last updated: <span id="timestamp">--</span>
+    </div>
+
+    <script>
+
+        async function fetchSensorData() {
+
+            try {
+
+                const response = await fetch("/api/sensors/latest");
+
+                if (!response.ok) {
+                    throw new Error("No sensor data available");
+                }
+
+                const data = await response.json();
+
+                document.getElementById("pressureRaw").textContent =
+                    data.pressure_raw;
+
+                document.getElementById("pressureVoltage").textContent =
+                    data.pressure_voltage + " V";
+
+                document.getElementById("fsrResistance").textContent =
+                    data.fsr_resistance === null
+                        ? "OPEN"
+                        : data.fsr_resistance + " Ω";
+
+                document.getElementById("temperature").textContent =
+                    data.temperature + " °C";
+
+                document.getElementById("timestamp").textContent =
+                    new Date(data.timestamp).toLocaleString();
+
+            } catch (error) {
+
+                console.error("Failed to fetch sensor data:", error);
+
+            }
+
+        }
+
+        // Load immediately
+        fetchSensorData();
+
+        // Automatically update every 2 seconds
+        setInterval(fetchSensorData, 2000);
+
+    </script>
+
+</body>
+</html>
